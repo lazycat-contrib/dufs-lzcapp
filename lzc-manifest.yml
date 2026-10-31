@@ -15,8 +15,8 @@ application:
         ctx.headers.set("Authorization", "Basic " + ctx.base64.encode(credentials));
 services:
   dufs:
-    # upstream: docker.io/sigoden/dufs:0.47.0
-    image: docker.1ms.run/sigoden/dufs:0.47.0
+    # upstream: docker.io/sigoden/dufs:v0.47.0
+    image: docker.1ms.run/sigoden/dufs:v0.47.0
     run_as: "1000:1000"
     command: >-
       /data --bind 0.0.0.0 --port 5000 --allow-upload --allow-delete --allow-search --allow-archive --allow-hash --auth lzcapp:{{ stable_secret "dufs-http-auth" | b64enc }}@/:rw
