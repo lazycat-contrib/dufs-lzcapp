@@ -1,0 +1,32 @@
+application:
+  subdomain: dufs
+  multi_instance: false
+  upstreams:
+    - location: /
+      backend: http://dufs:5000/
+  injects:
+    - id: internal-basic-auth
+      on: request
+      auth_required: true
+      when:
+        - /
+      do: |
+        const credentials = {{ printf "lzcapp:%s" (stable_secret "dufs-http-auth" | b64enc) | toJson }};
+        ctx.headers.set("Authorization", "Basic " + ctx.base64.encode(credentials));
+services:
+  dufs:
+    # upstream: docker.io/sigoden/dufs:0.47.0
+    image: docker.1ms.run/sigoden/dufs:0.47.0
+    run_as: "1000:1000"
+    command: >-
+      /data --bind 0.0.0.0 --port 5000 --allow-upload --allow-delete --allow-search --allow-archive --allow-hash --auth lzcapp:{{ stable_secret "dufs-http-auth" | b64enc }}@/:rw
+    binds:
+      - /lzcapp/var/files:/data
+usage: |
+  dufs 是轻量浏览器文件分享服务，支持上传、下载、搜索、删除及目录压缩下载。
+  保留懒猫入口认证，内部 HTTP Basic Auth 使用稳定随机密钥并由入口注入，用户无需另输密码。没有匿名公共路径或额外协议端口。
+  获授权成员共用同一个可读写文件目录，不提供每用户隔离；只向可信人员授予访问权限，操作删除会影响其他成员。
+  文件保存于应用内部 /lzcapp/var/files，卸载前请导出或备份，并非个人网盘目录。
+  未启用 --allow-all 或 --allow-symlink，避免跟随符号链接读取根目录以外文件。
+  使用 UID1000:1000 和目录属主映射，最低系统版本1.6.0。无需数据库，不添加文件选择器拦截或 smoke 作业。
+  未验证实机启动、认证注入、上传下载、删除、打包、WebDAV兼容性或重启持久化。

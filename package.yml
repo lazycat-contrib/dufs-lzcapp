@@ -1,0 +1,18 @@
+package: community.lazycat.app.dufs
+version: 0.47.0
+name: dufs
+description: Lightweight authenticated file sharing with uploads, downloads, searching and archives.
+min_os_version: "1.6.0"
+homepage: https://github.com/sigoden/dufs
+author: sigoden
+license: Apache-2.0
+permissions:
+  required:
+    - net.internet
+locales:
+  zh:
+    name: dufs
+    description: 轻量文件分享服务，支持认证、上传下载、搜索与目录打包。
+  en:
+    name: dufs
+    description: Lightweight authenticated file sharing with uploads, downloads, searching and archives.
